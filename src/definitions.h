@@ -103,7 +103,8 @@ enum ClipType {
     Playlist = 9,
     WebVfx = 10,
     TextTemplate = 11,
-    QText
+    TypeWriter = 12,
+    QText,
 };
 
 enum ProjectItemType {

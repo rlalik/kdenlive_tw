@@ -2552,6 +2552,9 @@ void Bin::slotCreateProjectClip()
     case TextTemplate:
         ClipCreationDialog::createTitleTemplateClip(m_doc, folderInfo, this);
         break;
+    case TypeWriter:
+        ClipCreationDialog::createTypeWriterClip(m_doc, folderInfo, QString(), this);
+        break;
     case QText:
         ClipCreationDialog::createQTextClip(m_doc, folderInfo, this);
         break;

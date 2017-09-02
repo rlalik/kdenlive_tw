@@ -358,6 +358,39 @@ void ClipCreationDialog::createTitleTemplateClip(KdenliveDoc *doc, const QString
     delete dia;
 }
 
+void ClipCreationDialog::createTypeWriterClip(KdenliveDoc *doc, const QStringList &groupInfo, const QString &templatePath, Bin *bin)
+{
+    // Make sure the titles folder exists
+    QDir dir(doc->projectDataFolder() + QStringLiteral("/titles"));
+    dir.mkpath(QStringLiteral("."));
+    QPointer<TitleWidget> dia_ui = new TitleWidget(QUrl::fromLocalFile(templatePath), doc->timecode(), dir.absolutePath(), doc->renderer(), bin);
+    QObject::connect(dia_ui.data(), &TitleWidget::requestBackgroundFrame, bin, &Bin::slotGetCurrentProjectImage);
+    if (dia_ui->exec() == QDialog::Accepted) {
+        // Ready, create clip xml
+        QDomDocument xml;
+        QDomElement prod = xml.createElement(QStringLiteral("producer"));
+        xml.appendChild(prod);
+        //prod.setAttribute("resource", imagePath);
+        int id = bin->getFreeClipId();
+        prod.setAttribute(QStringLiteral("id"), QString::number(id));
+
+        QMap<QString, QString> properties;
+        properties.insert(QStringLiteral("xmldata"), dia_ui->xml().toString());
+        properties.insert(QStringLiteral("kdenlive:clipname"), i18n("Title clip"));
+        if (!groupInfo.isEmpty()) {
+            properties.insert(QStringLiteral("kdenlive:folderid"), groupInfo.at(0));
+        }
+        addXmlProperties(prod, properties);
+        prod.setAttribute(QStringLiteral("type"), (int) Text);
+        prod.setAttribute(QStringLiteral("transparency"), QStringLiteral("1"));
+        prod.setAttribute(QStringLiteral("in"), QStringLiteral("0"));
+        prod.setAttribute(QStringLiteral("out"), dia_ui->duration() - 1);
+        AddClipCommand *command = new AddClipCommand(bin, xml.documentElement(), QString::number(id), true);
+        doc->commandStack()->push(command);
+    }
+    delete dia_ui;
+}
+
 void ClipCreationDialog::addXmlProperties(QDomElement &producer, QMap<QString, QString> &properties)
 {
     QMapIterator<QString, QString> i(properties);

@@ -33,6 +33,8 @@ class TitleDocument
 
 public:
     TitleDocument();
+    virtual ~TitleDocument() {}
+
     enum TitleProperties {
         OutlineWidth = 101,
         OutlineColor,
@@ -43,8 +45,8 @@ public:
     };
     void setScene(QGraphicsScene *scene, int width, int height);
     bool saveDocument(const QUrl &url, QGraphicsRectItem *startv, QGraphicsRectItem *endv, int duration, bool embed_images = false);
-    QDomDocument xml(QGraphicsRectItem *startv, QGraphicsRectItem *endv, bool embed_images = false);
-    int loadFromXml(const QDomDocument &doc, QGraphicsRectItem *startv, QGraphicsRectItem *endv, int *duration, const QString &projectpath = QString());
+    virtual QDomDocument xml(QGraphicsRectItem *startv, QGraphicsRectItem *endv, bool embed_images = false);
+    virtual int loadFromXml(const QDomDocument &doc, QGraphicsRectItem *startv, QGraphicsRectItem *endv, int *duration, const QString &projectpath = QString());
     /** \brief Get the background color (incl. alpha) from the document, if possibly
      * \returns The background color of the document, inclusive alpha. If none found, returns (0,0,0,0) */
     QColor getBackgroundColor() const;

@@ -30,6 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "ui_qtextclip_ui.h"
 #include "timecodedisplay.h"
 #include "titler/titlewidget.h"
+#include "titler/typewriterwidget.h"
 #include "titletemplatedialog.h"
 #include "project/dialogs/slideshowclip.h"
 
@@ -363,8 +364,8 @@ void ClipCreationDialog::createTypeWriterClip(KdenliveDoc *doc, const QStringLis
     // Make sure the titles folder exists
     QDir dir(doc->projectDataFolder() + QStringLiteral("/titles"));
     dir.mkpath(QStringLiteral("."));
-    QPointer<TitleWidget> dia_ui = new TitleWidget(QUrl::fromLocalFile(templatePath), doc->timecode(), dir.absolutePath(), doc->renderer(), bin);
-    QObject::connect(dia_ui.data(), &TitleWidget::requestBackgroundFrame, bin, &Bin::slotGetCurrentProjectImage);
+    QPointer<TypeWriterWidget> dia_ui = new TypeWriterWidget(QUrl::fromLocalFile(templatePath), doc->timecode(), dir.absolutePath(), doc->renderer(), bin);
+    QObject::connect(dia_ui.data(), &TypeWriterWidget::requestBackgroundFrame, bin, &Bin::slotGetCurrentProjectImage);
     if (dia_ui->exec() == QDialog::Accepted) {
         // Ready, create clip xml
         QDomDocument xml;
@@ -376,7 +377,7 @@ void ClipCreationDialog::createTypeWriterClip(KdenliveDoc *doc, const QStringLis
 
         QMap<QString, QString> properties;
         properties.insert(QStringLiteral("xmldata"), dia_ui->xml().toString());
-        properties.insert(QStringLiteral("kdenlive:clipname"), i18n("Title clip"));
+        properties.insert(QStringLiteral("kdenlive:clipname"), i18n("Type Writer clip"));
         if (!groupInfo.isEmpty()) {
             properties.insert(QStringLiteral("kdenlive:folderid"), groupInfo.at(0));
         }

@@ -1523,9 +1523,6 @@ void MainWindow::setupActions()
     action = addAction(QStringLiteral("add_text_clip"), i18n("Add Title Clip"), pCore->bin(), SLOT(slotCreateProjectClip()), KoIconUtils::themedIcon(QStringLiteral("kdenlive-add-text-clip")));
     action->setData((int) Text);
     addClips->addAction(action);
-    action = addAction(QStringLiteral("add_typewriter_clip"), i18n("Add Type Writer Clip"), pCore->bin(), SLOT(slotCreateProjectClip()), KoIconUtils::themedIcon(QStringLiteral("kdenlive-add-typewriter-clip")));
-    action->setData((int) TypeWriter);
-    addClips->addAction(action);
     action = addAction(QStringLiteral("add_text_template_clip"), i18n("Add Template Title"), pCore->bin(), SLOT(slotCreateProjectClip()), KoIconUtils::themedIcon(QStringLiteral("kdenlive-add-text-clip")));
     action->setData((int) TextTemplate);
     addClips->addAction(action);

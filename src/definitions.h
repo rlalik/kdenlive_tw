@@ -103,7 +103,6 @@ enum ClipType {
     Playlist = 9,
     WebVfx = 10,
     TextTemplate = 11,
-    TypeWriter = 12,
     QText,
 };
 

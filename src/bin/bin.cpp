@@ -38,6 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "dialogs/clipcreationdialog.h"
 #include "ui_qtextclip_ui.h"
 #include "titler/titlewidget.h"
+#include "titler/typewriterwidget.h"
 #include "core.h"
 #include "utils/KoIconUtils.h"
 #include "mltcontroller/clipcontroller.h"
@@ -67,6 +68,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QtConcurrent>
 #include <QUndoCommand>
 #include <QCryptographicHash>
+
+#define HAVE_TYPEWRITER
 
 MyListView::MyListView(QWidget *parent) : QListView(parent)
 {
@@ -1984,7 +1987,11 @@ void Bin::slotEditClip()
     switch (clip->clipType()) {
     case Text:
     case TextTemplate:
+#ifdef HAVE_TYPEWRITER
+        showTypeWriterWidget(clip);
+#else
         showTitleWidget(clip);
+#endif
         break;
     case SlideShow:
         showSlideshowWidget(clip);
@@ -2547,13 +2554,14 @@ void Bin::slotCreateProjectClip()
         ClipCreationDialog::createSlideshowClip(m_doc, folderInfo, this);
         break;
     case Text:
+#ifdef HAVE_TYPEWRITER
+        ClipCreationDialog::createTypeWriterClip(m_doc, folderInfo, QString(), this);
+#else
         ClipCreationDialog::createTitleClip(m_doc, folderInfo, QString(), this);
+#endif
         break;
     case TextTemplate:
         ClipCreationDialog::createTitleTemplateClip(m_doc, folderInfo, this);
-        break;
-    case TypeWriter:
-        ClipCreationDialog::createTypeWriterClip(m_doc, folderInfo, QString(), this);
         break;
     case QText:
         ClipCreationDialog::createQTextClip(m_doc, folderInfo, this);
@@ -3205,7 +3213,11 @@ void Bin::slotOpenClip()
     switch (clip->clipType()) {
     case Text:
     case TextTemplate:
+#ifdef HAVE_TYPEWRITER
+        showTypeWriterWidget(clip);
+#else
         showTitleWidget(clip);
+#endif
         break;
     case Image:
         if (KdenliveSettings::defaultimageapp().isEmpty()) {
@@ -3594,6 +3606,49 @@ void Bin::showTitleWidget(ProjectClip *clip)
     titleFolder.mkpath(QStringLiteral("."));
     TitleWidget dia_ui(QUrl(), m_doc->timecode(), titleFolder.absolutePath(), pCore->monitorManager()->projectMonitor()->render, pCore->window());
     connect(&dia_ui, &TitleWidget::requestBackgroundFrame, this, &Bin::slotGetCurrentProjectImage);
+    QDomDocument doc;
+    QString xmldata = clip->getProducerProperty(QStringLiteral("xmldata"));
+    if (xmldata.isEmpty() && QFile::exists(path)) {
+        QFile file(path);
+        doc.setContent(&file, false);
+        file.close();
+    } else {
+        doc.setContent(xmldata);
+    }
+    dia_ui.setXml(doc, clip->clipId());
+    if (dia_ui.exec() == QDialog::Accepted) {
+        QMap<QString, QString> newprops;
+        newprops.insert(QStringLiteral("xmldata"), dia_ui.xml().toString());
+        if (dia_ui.duration() != clip->duration().frames(m_doc->fps())) {
+            // duration changed, we need to update duration
+            newprops.insert(QStringLiteral("out"), QString::number(dia_ui.duration() - 1));
+            int currentLength = clip->getProducerIntProperty(QStringLiteral("kdenlive:duration"));
+            if (currentLength != dia_ui.duration()) {
+                newprops.insert(QStringLiteral("kdenlive:duration"), QString::number(dia_ui.duration()));
+            }
+        }
+        // trigger producer reload
+        newprops.insert(QStringLiteral("force_reload"), QStringLiteral("2"));
+        if (!path.isEmpty()) {
+            // we are editing an external file, asked if we want to detach from that file or save the result to that title file.
+            if (KMessageBox::questionYesNo(pCore->window(), i18n("You are editing an external title clip (%1). Do you want to save your changes to the title file or save the changes for this project only?", path), i18n("Save Title"), KGuiItem(i18n("Save to title file")), KGuiItem(i18n("Save in project only"))) == KMessageBox::Yes) {
+                // save to external file
+                dia_ui.saveTitle(QUrl::fromLocalFile(path));
+            } else {
+                newprops.insert(QStringLiteral("resource"), QString());
+            }
+        }
+        slotEditClipCommand(clip->clipId(), clip->currentProperties(newprops), newprops);
+    }
+}
+
+void Bin::showTypeWriterWidget(ProjectClip* clip)
+{
+    QString path = clip->getProducerProperty(QStringLiteral("resource"));
+    QDir titleFolder(m_doc->projectDataFolder() + QStringLiteral("/titles"));
+    titleFolder.mkpath(QStringLiteral("."));
+    TypeWriterWidget dia_ui(QUrl(), m_doc->timecode(), titleFolder.absolutePath(), pCore->monitorManager()->projectMonitor()->render, pCore->window());
+    connect(&dia_ui, &TypeWriterWidget::requestBackgroundFrame, this, &Bin::slotGetCurrentProjectImage);
     QDomDocument doc;
     QString xmldata = clip->getProducerProperty(QStringLiteral("xmldata"));
     if (xmldata.isEmpty() && QFile::exists(path)) {

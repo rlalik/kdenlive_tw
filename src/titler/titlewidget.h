@@ -94,6 +94,8 @@ protected:
     void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
     void keyPressEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
 
+    virtual TitleDocument & document() { return m_titledocument; }
+
 private:
 
     /** @brief Rectangle describing the animation start viewport. */

@@ -550,6 +550,7 @@ private:
     AbstractProjectItem *getClipForId(const QString &id) const;
     ProjectClip *getFirstSelectedClip();
     void showTitleWidget(ProjectClip *clip);
+    void showTypeWriterWidget(ProjectClip *clip);
     void showSlideshowWidget(ProjectClip *clip);
     void processAudioThumbs();
 

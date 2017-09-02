@@ -1933,7 +1933,7 @@ void TitleWidget::saveTitle(QUrl url)
         delete fs;
     }
     if (url.isValid()) {
-        if (m_titledocument.saveDocument(url, m_startViewport, m_endViewport, m_tc.getFrameCount(title_duration->text()), embed_image) == false) {
+        if (document().saveDocument(url, m_startViewport, m_endViewport, m_tc.getFrameCount(title_duration->text()), embed_image) == false) {
             KMessageBox::error(this, i18n("Cannot write to file %1", url.toLocalFile()));
         }
     }
@@ -1956,7 +1956,7 @@ void TitleWidget::setXml(const QDomDocument &doc, const QString &id)
 {
     m_clipId = id;
     int duration;
-    m_count = m_titledocument.loadFromXml(doc, m_startViewport, m_endViewport, &duration, m_projectTitlePath);
+    m_count = document().loadFromXml(doc, m_startViewport, m_endViewport, &duration, m_projectTitlePath);
     adjustFrameSize();
     title_duration->setText(m_tc.getTimecode(GenTime(duration, m_fps)));
     /*if (doc.documentElement().hasAttribute("out")) {

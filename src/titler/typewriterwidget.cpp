@@ -105,15 +105,6 @@ TypeWriterDocument & TypeWriterWidget::document()
 QDomDocument TypeWriterWidget::xml()
 {
     QDomDocument doc_tw = m_typewriterdocument.xml(nullptr, nullptr);
-    QDomDocument doc_title = TitleWidget::xml();
-
-    QDomElement root_tw = doc_tw.documentElement();
-    QDomElement root_title = doc_title.documentElement();
-
-    QDomNodeList list = root_title.childNodes();
-    for (int i = 0; i < list.length(); ++i)
-        root_tw.appendChild(list.at(i));
-
     return doc_tw;
 }
 

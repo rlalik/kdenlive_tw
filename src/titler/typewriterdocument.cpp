@@ -56,6 +56,7 @@ QDomDocument TypeWriterDocument::xml(QGraphicsRectItem *startv, QGraphicsRectIte
         return doc;
 
     QDomElement el_pats = doc.createElement(QStringLiteral("patterns"));
+    el_pats.setAttribute(QStringLiteral("version"), 1);
     doc.appendChild(el_pats);
 
     int n = patterns->count();
@@ -113,13 +114,13 @@ int TypeWriterDocument::loadFromXml(const QDomDocument &doc, QGraphicsRectItem *
                     QDomNodeList l = p.childNodes();
                     for (int k = 0; k < l.count(); ++k)
                     {
-                        QDomNode pi = ps.item(j);
+                        QDomNode pi = l.item(k);
                         if (pi.nodeName() == "text")
-                            item->setData(Qt::UserRole+0, pi.firstChild().toElement().nodeValue());
+                            item->setData(Qt::UserRole+0, pi.firstChild().nodeValue());
                         else if (pi.nodeName() == "length")
-                            item->setData(Qt::UserRole+1, pi.firstChild().toElement().nodeValue().toInt());
+                            item->setData(Qt::UserRole+1, pi.firstChild().nodeValue().toInt());
                         else if (pi.nodeName() == "fill")
-                            item->setData(Qt::UserRole+2, pi.firstChild().toElement().nodeValue());
+                            item->setData(Qt::UserRole+2, pi.firstChild().nodeValue());
                     }
                     patterns->addItem(item);
                 }

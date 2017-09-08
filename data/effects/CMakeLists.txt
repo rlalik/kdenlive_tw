@@ -129,7 +129,7 @@ swapchannels.xml
 tcolor.xml
 vignette.xml
 tracker.xml
-
+typewriter.xml
 
 DESTINATION ${DATA_INSTALL_DIR}/kdenlive/effects)
 

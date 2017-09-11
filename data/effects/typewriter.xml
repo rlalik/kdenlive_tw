@@ -3,10 +3,10 @@
 	<name>TypeWriter</name>
 	<description>Typewriter effect</description>
 	<author>Rafał Lalik</author>
-    <parameter type="list" name="beg" default="|^|" paramlist="|^|,@{">
+    <parameter type="list" name="beg" default="|^|" paramlist="|^|,##">
         <name>Begin marker</name>
     </parameter>
-    <parameter type="list" name="end" default="|$|" paramlist="|$|,}@">
+    <parameter type="list" name="end" default="|$|" paramlist="|$|,##">
         <name>End marker</name>
     </parameter>
 </effect>

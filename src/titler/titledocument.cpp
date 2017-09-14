@@ -186,7 +186,7 @@ QDomDocument TitleDocument::xml(QGraphicsRectItem *startv, QGraphicsRectItem *en
                 continue;
             }
             //content.appendChild(doc.createTextNode(((QGraphicsTextItem*)item)->toHtml()));
-            content.appendChild(doc.createTextNode(t->toPlainText()));
+            content.appendChild(doc.createCDATASection(t->toPlainText()));
             font = t->font();
             content.setAttribute(QStringLiteral("font"), font.family());
             content.setAttribute(QStringLiteral("font-weight"), font.weight());
@@ -424,7 +424,7 @@ int TitleDocument::loadFromXml(const QDomDocument &doc, QGraphicsRectItem *start
                     }
                     font.setLetterSpacing(QFont::AbsoluteSpacing, txtProperties.namedItem(QStringLiteral("letter-spacing")).nodeValue().toInt());
                     QColor col(stringToColor(txtProperties.namedItem(QStringLiteral("font-color")).nodeValue()));
-                    MyTextItem *txt = new MyTextItem(itemNode.namedItem(QStringLiteral("content")).firstChild().nodeValue(), nullptr);
+                    MyTextItem *txt = new MyTextItem(itemNode.namedItem(QStringLiteral("content")).firstChild().toCDATASection().nodeValue(), nullptr);
                     m_scene->addItem(txt);
                     txt->setFont(font);
                     txt->setTextInteractionFlags(Qt::NoTextInteraction);
